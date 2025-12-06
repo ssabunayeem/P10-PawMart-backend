@@ -40,7 +40,12 @@ async function run() {
 
         // Get Services from DB
         app.get('/services', async (req, res) => {
-            const result = await petServices.find().toArray();
+            const { category } = req.query;
+            const query = {};
+            if (category) {
+                query.category = category;
+            }
+            const result = await petServices.find(query).toArray();
             res.send(result);
         })
 
@@ -54,6 +59,39 @@ async function run() {
         })
 
 
+        app.get('/my-services', async (req, res) => {
+            const { email } = req.query;
+            const query = { email: email };
+            const result = await petServices.find(query).toArray()
+            res.send(result);
+        })
+
+
+        app.put('/update/:id', async (req, res) => {
+
+            const data = req.body;
+            const id = req.params;
+            const query = { _id: new ObjectId(id) }
+
+            const updateServices = {
+                $set: data
+            }
+
+            const result = await petServices.updateOne(query, updateServices);
+            res.send(result);
+
+        })
+
+        app.delete('/delete/:id', async (req, res) => {
+            const id = req.params;
+            const query = { _id: new ObjectId(id) }
+            const result = await petServices.deleteOne(query);
+            res.send(result);
+        })
+
+
+        // npm i mongodb express cors dotenv
+        // Send a ping to confirm a successful connection
 
 
         await client.db("admin").command({ ping: 1 });
