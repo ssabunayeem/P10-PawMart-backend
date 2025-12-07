@@ -26,6 +26,7 @@ async function run() {
 
         const database = client.db('petService');
         const petServices = database.collection('services');
+        const orderCollection = database.collection('orders');
 
         // Post  or save service to DB
         app.post('/services', async (req, res) => {
@@ -89,6 +90,20 @@ async function run() {
             res.send(result);
         })
 
+
+        app.post('/orders', async (req, res) => {
+            const data = req.body;
+            console.log(data);
+            const result = await orderCollection.insertOne(data);
+            res.status(201).send(result);
+        })
+
+        app.get('/orders', async (req, res) => {
+            const { email } = req.query;
+            const query = { email: email };
+            const result = await orderCollection.find(query).toArray();
+            res.status(200).send(result);
+        })
 
         // npm i mongodb express cors dotenv
         // Send a ping to confirm a successful connection
